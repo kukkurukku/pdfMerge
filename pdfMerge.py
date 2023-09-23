@@ -24,7 +24,7 @@ def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(.)
+        base_path = os.path.abspath('.')
     return os.path.join(base_path, relative_path)
 
 #creatingClasses
@@ -32,4 +32,16 @@ def resource_path(relative_path):
 class PDFApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle
+        self.setWindowTitle('PDF Bundler')  #appTitle
+        self.setWindowIcon(QIcon(resource_path('DesignAIconInIllustrator')))  #AppIcon #need to add an icon
+        self.resize(960, 540) #windowSize
+
+app = QApplication(sys.argv)
+app.setStyle('fusion') #iwilleditthislater
+
+pdfApp = PDFApp()
+pdfApp.show()
+
+sys.exit(app.exec_())
+
+#donewithshell
