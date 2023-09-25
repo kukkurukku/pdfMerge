@@ -32,7 +32,7 @@ def resource_path(relative_path):
 
 #dragAndDropFeature
 class ListWidget(QListWidget):
-    def __init__(self, parent: QWidget | None = ...) -> None:
+    def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setAcceptDrops(True)
         self.setStyleSheet('font-size: 25px;')
@@ -59,20 +59,89 @@ class ListWidget(QListWidget):
 
             pdfFiles = []
 
-            for url in evnet.mimeData().urls():
+            for url in event.mimeData().urls(): #hadtypo
                 if url.isLocalFile():
                     if url.toString().endswith('.pdf'):
                                                pdfFiles.append(str(url.toLocalFile()))
         else:    
             return super().dropEvent(event)
 
+class output_field(QLineEdit):
+     def __init__(self):
+          super().__init__()
+          self.height = 60
+          self.setStyleSheet('font-size: 18px;') #changedhereotherwiselookstoolarge
+
+     def dragEnterEvent(self, event):
+            if event.mimeData().hasUrls():
+                event.accept()
+            else:
+                event.ignore()
+
+     def dragMoveEvent(self, event):
+            if event.mimeData().hasUrls():
+                 event.setDropAction(Qt.CopyAction)
+                 event.accept()
+            else:
+                 event.ignore()
+     def dropEvent(self, event):
+          if event.mimeData().hasUrls():
+               event.setDropAction(Qt.CopyAction)
+               event.accept()
+               if event.mimeData().urls():
+                    self.setText(event.mimeData().urls()[0].toLocalFile())
+          else:
+               event.ignore()
+
+               
+class button(QPushButton):
+     def __init__(self, label_text):
+          super().__init__()
+          self.setText(label_text)
+          self.setStyleSheet('''
+                             font-size: 16px;
+                             width: 180px;
+                             height: 20 px;
+                             ''')
+
+
 class PDFApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('PDF Bundler')  #appTitle
+        self.setWindowTitle('PDF Merge')  #appTitle
         #self.setWindowIcon(QIcon(resource_path('DesignAIconInIllustrator')))  #AppIcon #need to add an icon
-        self.resize(960, 540) #windowSize
+        self.resize(720, 480) #windowSize #changed
+        self.initUI()
+    def initUI(self):
+        mainLayout = QVBoxLayout()
+        outputFolderRow = QHBoxLayout()
+        buttonLayout = QHBoxLayout()
 
+        self.outputFile = output_field()
+        outputFolderRow.addWidget(self.outputFile)
+
+        self.buttonBrowseOutputFile = button('&Save To')
+        outputFolderRow.addWidget(self.buttonBrowseOutputFile)
+
+        #listBox
+        self.pdfListWidget = ListWidget(self)
+
+        #buttons
+        self.buttonDeleteSelect = button('&Delete')
+        buttonLayout.addWidget(self.buttonDeleteSelect, 1, Qt.AlignRight) # 1 doesthemagic
+
+        self.buttonMerge = button('&Merge')
+        buttonLayout.addWidget(self.buttonMerge)
+
+        self.buttonReset = button('&Reset')
+        buttonLayout.addWidget(self.buttonReset)
+
+        mainLayout.addLayout(outputFolderRow)
+        mainLayout.addWidget(self.pdfListWidget)
+        mainLayout.addLayout(buttonLayout)
+        self.setLayout(mainLayout)
+
+        #thatsitforUI
 app = QApplication(sys.argv)
 app.setStyle('fusion') #iwilleditthislater
 
